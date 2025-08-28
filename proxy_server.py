@@ -17,7 +17,7 @@ from prompt_toolkit.completion import WordCompleter
 
 app = Flask(__name__)
 
-VIDEO_DIRECTORY = "/home/etech/Mine/john/kana/videos"
+VIDEO_DIRECTORY = "./videos"
 
 os.makedirs(VIDEO_DIRECTORY, exist_ok=True)
 
@@ -66,9 +66,9 @@ def download_file(url, dest):
 
     # Check for existing file to resume
     downloaded = 0
-    if os.path.exists(dest):
-        downloaded = os.path.getsize(dest)
-        headers['Range'] = f'bytes={downloaded}-'
+    # if os.path.exists(dest):
+    #     downloaded = os.path.getsize(dest)
+    #     headers['Range'] = f'bytes={downloaded}-'
 
     # Make request with Range header
     with requests.get(url, headers=headers, stream=True) as r:
@@ -95,7 +95,9 @@ def download_file(url, dest):
                     bar.update(len(chunk))
 
 def checkIfDownloaded(video_url):
+    local_ip = get_local_ip()
     """Check if the file is already downloaded, and prompt for confirmation if not."""
+    video_url = video_url.replace(rf"http://{local_ip}:5000/habesha/", "")
     videos_dir = './videos'
     os.makedirs(videos_dir, exist_ok=True)
     file_path = os.path.basename(video_url)
@@ -429,7 +431,6 @@ def stream_video(video_url):
 
     # Create the full local path to the video file
     local_path = os.path.join(VIDEO_DIRECTORY, filename)
-    print(f"Local path: {local_path}")
 
     # Check if the video file exists
     if not os.path.exists(local_path):
@@ -467,7 +468,6 @@ def proxy_video(video_url):
 
     # Create the full local path to the video file
     local_path = os.path.join(VIDEO_DIRECTORY, filename)
-    print(os.path.exists(local_path))
 
     # Check if the video file exists locally
     if os.path.exists(local_path):
